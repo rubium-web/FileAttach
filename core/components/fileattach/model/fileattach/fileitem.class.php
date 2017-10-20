@@ -245,4 +245,27 @@ class FileItem extends xPDOSimpleObject {
 
 		return stripslashes(str_replace($bad, '', $str));
 	}
+
+    /**
+     * @param array|string $k
+     * @param null $format
+     * @param null $formatTemplate
+     *
+     * @return mixed
+     */
+    public function get($k, $format = null, $formatTemplate = null)
+    {
+        if (strtolower($k) == 'tags') {
+            $tags = array();
+            $q = $this->xpdo->newQuery('FileTagItem', array('file_id' => $this->get('id')));
+            $q->select('tag');
+            if ($q->prepare() && $q->stmt->execute()) {
+                $tags = $q->stmt->fetchAll(PDO::FETCH_COLUMN);
+            }
+
+            return $tags;
+        } else {
+            return parent::get($k, $format, $formatTemplate);
+        }
+    }
 }

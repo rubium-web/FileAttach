@@ -67,6 +67,22 @@ $tmp = array(
 		'type' => 'textfield',
 		'value' => '',
 	),
+	'tags' => array(
+		'type' => 'textfield',
+		'value' => '',
+	),
+	'getTags' => array(
+		'type' => 'combo-boolean',
+		'value' => false,
+	),
+	'tagsSeparator' => array(
+		'type' => 'textfield',
+		'value' => ',',
+	),
+	'tagsVar' => array(
+		'type' => 'textfield',
+		'value' => '',
+	)
 );
 
 foreach ($tmp as $k => $v) {

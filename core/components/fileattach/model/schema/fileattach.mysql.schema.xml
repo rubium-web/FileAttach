@@ -33,6 +33,22 @@
 		<aggregate alias="Document" class="modResource" local="docid" foreign="id" cardinality="one" owner="foreign"/>
 	</object>
 
+    <object class="FileTagItem" table="files_tags" extends="xPDOObject">
+        <field key="file_id" dbtype="int" precision="10" attributes="unsigned" phptype="integer" null="false"/>
+        <field key="tag" dbtype="varchar" precision="255" phptype="string" null="false"/>
+
+        <index alias="file" name="product" primary="true" unique="true" type="BTREE">
+            <column key="file_id" length="" collation="A" null="false"/>
+            <column key="tag" length="" collation="A" null="false"/>
+        </index>
+
+        <aggregate alias="File" class="FileItem" local="file_id" foreign="id" cardinality="one" owner="foreign">
+            <criteria target="foreign"><![CDATA[
+            {"parent":"0"}
+          ]]></criteria>
+        </aggregate>
+    </object>
+
 	<object class="FileAttachMediaSource" extends="modMediaSource">
 	</object>
 </model>

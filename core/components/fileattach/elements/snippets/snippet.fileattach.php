@@ -47,6 +47,10 @@ $groups = $modx->getOption('groups', $scriptProperties, '');
 $offset = $modx->getOption('offset', $scriptProperties, 0);
 $totalVar = $modx->getOption('totalVar', $scriptProperties, 'total');
 
+if (empty($tagsSeparator)) {
+    $tagsSeparator = ',';
+}
+
 // Check access
 if ($groups != '') {
 	// Forbid access for non-authorized visitor
@@ -89,6 +93,17 @@ else
 
 $c->where(array('docid' => ($resource > 0)? $resource : $modx->resource->get('id')));
 
+if (!empty($tagsVar) && isset($_REQUEST[$tagsVar])) {
+    $tags = $modx->stripTags($_REQUEST[$tagsVar]);
+}
+
+if (!empty($tags)) {
+    $tags = array_map('trim', explode(',', str_replace('"', '', $tags)));
+    $tags = implode('","', $tags);
+    $c->innerJoin('FileTagItem', 'Tag', 'Tag.file_id = FileItem.id AND Tag.tag IN ("' . $tags . '")');
+    $c->groupby('id');
+}
+
 if (!empty($limit)) {
 	$total = $modx->getCount('FileItem', $c);
 	$modx->setPlaceholder($totalVar, $total);
@@ -124,7 +139,15 @@ foreach ($items as $item) {
 	if ($showExt) {
 		$itemArr['ext'] = strtolower(
 			pathinfo($itemArr['name'], PATHINFO_EXTENSION));
-		}
+	}
+
+    if (!empty($getTags)) {
+        $q = $modx->newQuery('FileTagItem', array('file_id' => $itemArr['id']));
+        $q->select('tag');
+        if ($q->prepare() && $q->stmt->execute()) {
+            $itemArr['tags'] = implode($tagsSeparator, $q->stmt->fetchAll(PDO::FETCH_COLUMN));
+        }
+    }
 
 	$list[] = $modx->getChunk($tpl, $itemArr);
 }
