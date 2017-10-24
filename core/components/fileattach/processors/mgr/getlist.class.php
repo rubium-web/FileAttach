@@ -55,6 +55,7 @@ class FileItemGetListProcessor extends modObjectGetListProcessor {
 		$docid = (int) $this->getProperty('docid');
 		$uid = trim($this->getProperty('uid'));
 		$query = trim($this->getProperty('query'));
+		$tags = trim($this->getProperty('tags'));
 
 		$c->select($this->modx->getSelectColumns('FileItem', 'FileItem'));
 
@@ -64,6 +65,13 @@ class FileItemGetListProcessor extends modObjectGetListProcessor {
 		if ($uid || ($docid == 0)) {
 			$c->select('User.username');
 			$c->leftJoin('modUser', 'User', 'User.id=FileItem.uid');
+		}
+
+		if (strlen($tags) > 0) {
+			$t = explode(',', $tags);
+			$c->leftJoin('FileTagItem', 'FT', 'FT.file_id = FileItem.id');
+			$c->where(array('FT.tag:IN' => $t));
+			$c->groupby('FileItem.id');
 		}
 
 		if ($uid)

@@ -45,6 +45,7 @@ switch ($modx->event->name) {
 
 		$modx->FileAttach = new FileAttach($modx);
 		$modx->controller->addJavascript($modx->FileAttach->config['jsUrl'] . 'mgr/fileattach.js');
+		$modx->controller->addJavascript($modx->FileAttach->config['jsUrl'] . 'mgr/helpers/fileattach.combo.js');
 		$modx->controller->addJavascript($modx->FileAttach->config['jsUrl'] . 'mgr/widgets/items.grid.js');
 		$modx->controller->addLastJavascript($modx->FileAttach->config['jsUrl'] . 'mgr/filestab.js');
 		$modx->controller->addHtml('<script type="text/javascript">FileAttach.config = ' . $modx->toJSON($modx->FileAttach->config) . ';</script>');

@@ -31,6 +31,18 @@ class FileItemGetProcessor extends modObjectGetProcessor {
 	public $languageTopics = array('fileattach:default');
 	public $permission = 'view';
 
+	public function beforeOutput() {
+		
+		$tags = $this->object->get('tags');
+
+		if(is_array($tags)) {
+
+			$tags = array_filter($tags, function($it) { return !empty($it); } );
+
+			if(count($tags) > 0) $this->object->set('tags', $tags);
+		}
+	}
+
 
 	/**
 	 * We doing special check of permission

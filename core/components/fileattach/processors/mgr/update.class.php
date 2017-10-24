@@ -56,6 +56,17 @@ class FileItemUpdateProcessor extends modObjectUpdateProcessor {
 		if (empty($id))
 			return $this->modx->lexicon('fileattach.item_err_ns');
 
+		$tags = $this->getProperty('tags');
+		
+		if (!empty($tags)) {
+
+			$this->modx->removeCollection('FileTagItem', array('file_id' => $id));
+
+			foreach ($tags as $tag) {
+				$this->modx->newObject('FileTagItem', array('file_id' => $id, 'tag' => $tag))->save();
+			}
+		}
+
 		if (!$docid)
 			$this->modx->error->addField('docid', $this->modx->lexicon('notset'));
 

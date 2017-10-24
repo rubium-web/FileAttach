@@ -94,6 +94,24 @@ Ext.extend(FileAttach.window.UpdateItem, MODx.Window, {
 			scope: this
 		}]);
 
+	var tags = "";
+	if(typeof(config.record.object['tags']) == "object" && config.record.object['tags'].length){
+		var tagsArr = config.record.object['tags'];
+		tags = [];
+		for (var i = 0; i < tagsArr.length; i++) {
+			tags.push( {"tag" : tagsArr[i]} );
+		}
+	}
+
+	fields.push({
+		xtype: 'fileattach-combo-tags',
+		fieldLabel: _('fileattach.tags'),
+		name: 'tags',
+		id: config.id + '-tags',
+		anchor: '100%',
+		value: tags
+	});
+
 	fields.push([{
 		xtype: 'xcheckbox',
 		id: config.id + '-private',
@@ -293,7 +311,7 @@ Ext.extend(FileAttach.grid.Items, MODx.grid.Grid, {
 								success: { fn: function () { this.refresh(); }, scope: this }
 							}
 						});
-						w.reset();
+						try{ w.reset(); }catch(e){}
 						w.setValues(r.object);
 						w.show(e.target);
 					}, scope: this
@@ -409,7 +427,7 @@ Ext.extend(FileAttach.grid.Items, MODx.grid.Grid, {
 
 	// Define visible fields
 	getFields: function (config) {
-		return ['id', 'name', 'description', 'docid', 'download', 'private', 'pagetitle', 'username', 'rank'];
+		return ['id', 'name', 'description', 'docid', 'download', 'private', 'pagetitle', 'username', 'rank', 'tags'];
 	},
 
 	// Define columns
@@ -494,7 +512,35 @@ Ext.extend(FileAttach.grid.Items, MODx.grid.Grid, {
 				scope: this
 			}],
 			text: _('bulk_actions')
-		}, '->', {
+		}, '->',
+		{
+            xtype: 'fileattach-combo-tags',
+            id: 'fileattach-combo-tags-filter',
+            width: 300,
+            emptyText: _('fileattach_file_tags'),
+            allowAddNewData: false,
+            addNewDataOnBlur: false,
+            supressClearValueRemoveEvents: true,
+            pageSize: 10,
+            listeners: {
+                clear: {
+                    fn: function () {
+                        this.clearTags();
+                    }, scope: this
+                },
+                additem: {
+                    fn: function (tf) {
+                        this.Tags(tf);
+                    }, scope: this
+                },
+                removeitem: {
+                    fn: function (tf) {
+                        this.Tags(tf);
+                    }, scope: this
+                },
+            },
+        },
+		{
 			xtype: 'textfield',
 			name: 'uid',
 			width: 200,
@@ -533,6 +579,18 @@ Ext.extend(FileAttach.grid.Items, MODx.grid.Grid, {
 
 		return fields;
 	},
+
+	 Tags: function (tf) {
+        var s = this.getStore();
+        s.baseParams.tags = tf.getValue();
+        this.getBottomToolbar().changePage(1);
+    },
+
+    clearTags: function () {
+        var s = this.getStore();
+        s.baseParams.tags = '';
+        this.getBottomToolbar().changePage(1);
+    },
 
 	// Header button handler
 	onClick: function (e) {

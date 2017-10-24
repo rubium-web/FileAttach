@@ -11,7 +11,10 @@ $_lang['fileattach.open'] = 'Открыть доступ';
 $_lang['fileattach.private'] = 'Закрыть доступ';
 $_lang['fileattach.reset'] = 'Сбросить счетчик';
 
+$_lang['fileattach_file_tags'] = 'Поиск по тегам';
+
 $_lang['fileattach.fid'] = 'ID файла';
+$_lang['fileattach.tags'] = 'Теги';
 $_lang['fileattach.hash'] = 'Контрольная сумма SHA1';
 $_lang['fileattach.size'] = 'Размер';
 
