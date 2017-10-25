@@ -12,7 +12,7 @@ if ($object->xpdo) {
 		case xPDOTransport::ACTION_INSTALL:
 			// Create tables
 			$objects = array(
-				'FileItem', 'FileAttachMediaSource'
+				'FileItem', 'FileAttachMediaSource', 'FileTagItem'
 			);
 			foreach ($objects as $tmp) {
 				$manager->createObjectContainer($tmp);
@@ -52,8 +52,14 @@ if ($object->xpdo) {
 						$manager->addIndex('FileItem', 'fid');
 					}
 
+					if ($version < 1011) {
+						$manager->createObjectContainer('FileTagItem');
+					}
+
 					$modx->setLogLevel($oldLogLevel);
 			}
+
+
 
 			// Find old records with empty file ID
 			$needID = $modx->getCollection('FileItem', array('fid' => ''));
