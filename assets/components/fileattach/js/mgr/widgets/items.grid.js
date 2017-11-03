@@ -17,6 +17,7 @@ FileAttach.window.UpdateItem = function (config) {
 	if (!config.id) {
 		config.id = 'fileattach-item-window-update';
 	}
+
 	Ext.applyIf(config, {
 		title: _('update'),
 		width: 550,
@@ -148,6 +149,7 @@ Ext.extend(FileAttach.window.UpdateItem, MODx.Window, {
 	return fields;
 	}
 });
+
 Ext.reg('fileattach-item-window-update', FileAttach.window.UpdateItem);
 
 FileAttach.grid.Items = function (config) {
@@ -226,6 +228,47 @@ FileAttach.grid.Items = function (config) {
 		}
 	}, this);
 }
+
+FileAttach.window.editTags = function(config) {
+	config = config || {};
+	if (!config.id) {
+		config.id = 'fileattach-item-window-edittags';
+	}
+	
+	var fields = [{
+		xtype: 'fileattach-combo-tags',
+		fieldLabel: _('fileattach.tags'),
+		name: 'tags',
+		id: config.id + '-tags',
+		anchor: '100%',
+		value: []
+	},{
+		xtype: 'hidden',
+		name: 'ids',
+		id: config.id + '-id',
+		value: config.ids
+	}];
+
+	Ext.applyIf(config, {
+		title: _('update'),
+		width: 550,
+		autoHeight: true,
+		url: FileAttach.config.connectorUrl,
+		action: 'mgr/savetags',
+		fields: fields,
+		keys: [{
+			key: Ext.EventObject.ENTER, shift: true, fn: function () {
+				this.submit()
+			}, scope: this}]
+	});
+
+	FileAttach.window.editTags.superclass.constructor.call(this, config);
+}
+
+Ext.extend(FileAttach.window.editTags, MODx.Window,{});
+
+Ext.reg('fileattach-item-window-edittags', FileAttach.window.editTags);
+
 Ext.extend(FileAttach.grid.Items, MODx.grid.Grid, {
 	windows: {},
 
@@ -507,10 +550,14 @@ Ext.extend(FileAttach.grid.Items, MODx.grid.Grid, {
 				handler: this.resetItem,
 				scope: this
 				}, {
+					text: _('fileattach.edittags'),
+					handler: this.editTags,
+					scope: this
+				}, {
 				text: _('remove'),
 				handler: this.removeItem,
 				scope: this
-			}],
+				}],
 			text: _('bulk_actions')
 		}, '->',
 		{
@@ -579,6 +626,24 @@ Ext.extend(FileAttach.grid.Items, MODx.grid.Grid, {
 
 		return fields;
 	},
+
+	editTags: function (btn, e) {
+        var ids = this._getSelectedIds();
+        var tags = [];
+        if(!ids.length) return false;
+      
+        var w = MODx.load({
+            xtype: 'fileattach-item-window-edittags',
+            ids: Ext.util.JSON.encode(ids),
+            id: Ext.id(),
+            listeners: {
+                success: {
+                    fn: function () {  this.store.reload() }, scope: this
+                }
+            }
+        });
+        w.show(e.target);
+    },
 
 	 Tags: function (tf) {
         var s = this.getStore();
